@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
+
+
 import 'ButtonDemo.dart';
 import 'LayoutDemo.dart';
 import 'ListViewDemo.dart';
 import 'ListViewDemo2.dart';
 import 'ImageDemo.dart';
 import 'TextDemo.dart';
+import 'PaintDemo.dart';
+import 'ThemeDemo.dart';
+import 'GestureDemo.dart';
+import 'NotificationDemo.dart';
+import 'NavigatorDemo.dart';
 
 void main() {
-  runApp(LayoutDemo());
+  runApp(NavigatorDemo());
 }
 
 class MyApp extends StatelessWidget {
