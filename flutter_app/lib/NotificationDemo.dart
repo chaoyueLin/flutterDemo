@@ -42,7 +42,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState2 createState() => _MyHomePageState2();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -82,42 +82,3 @@ class CustomChild extends StatelessWidget {
   }
 }
 
-class CountContainer extends InheritedWidget {
-  //方便其子Widget在Widget树中找到它
-  static CountContainer of(BuildContext context) =>
-      context.inheritFromWidgetOfExactType(CountContainer) as CountContainer;
-
-  final int count;
-
-  CountContainer({
-    Key key,
-    @required this.count,
-    @required Widget child,
-  }) : super(key: key, child: child);
-
-  // 判断是否需要更新
-  @override
-  bool updateShouldNotify(CountContainer oldWidget) => count != oldWidget.count;
-}
-
-class _MyHomePageState2 extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    //将CountContainer作为根节点，并使用0作为初始化count
-    return CountContainer(count: 0, child: Counter());
-  }
-}
-
-class Counter extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    //获取InheritedWidget节点
-    CountContainer state = CountContainer.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text("InheritedWidget demo")),
-      body: Text(
-        'You have pushed the button this many times: ${state.count}',
-      ),
-    );
-  }
-}

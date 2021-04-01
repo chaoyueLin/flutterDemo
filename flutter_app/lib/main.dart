@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 
 import 'ButtonDemo.dart';
+import 'InheritedDemo.dart';
 import 'LayoutDemo.dart';
 import 'ListViewDemo.dart';
 import 'ListViewDemo2.dart';
@@ -15,7 +16,7 @@ import 'NotificationDemo.dart';
 import 'NavigatorDemo.dart';
 
 void main() {
-  runApp(NavigatorDemo());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -63,7 +64,34 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    //将CountContainer作为根节点，并使用0作为初始化count
+    return CountContainer(
+        count: 1,
+        //子widget是CountContainer state = CountContainer.of(context);
+        child: Counter()
+    );
+  }
+}
+
+class Counter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    //获取InheritedWidget节点
+    CountContainer state = CountContainer.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text("InheritedWidget demo")),
+      body: Text(
+        'You have pushed the button this many times: ${state.count}',
+      ),
+    );
+  }
+}
+
+class _MyHomePageState2 extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
