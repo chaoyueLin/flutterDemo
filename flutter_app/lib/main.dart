@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 
 
+
 import 'ButtonDemo.dart';
 import 'InheritedDemo.dart';
 import 'LayoutDemo.dart';
@@ -14,9 +15,12 @@ import 'ThemeDemo.dart';
 import 'GestureDemo.dart';
 import 'NotificationDemo.dart';
 import 'NavigatorDemo.dart';
+import 'AnimateDemo.dart';
+import 'HeroDemo.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(
+      home:Page1()));
 }
 
 class MyApp extends StatelessWidget {

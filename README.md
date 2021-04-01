@@ -37,6 +37,7 @@ StatelessWidget 是静态的，一旦创建则无需更新；
 
 ## 生命周期
 ### State
+![](./state.png)
 #### 创建，
 构造方法 -> initState -> didChangeDependencies -> build，随后完成页面渲染。
 #### 更新
@@ -56,6 +57,7 @@ StatelessWidget 是静态的，一旦创建则无需更新；
 * inactive：处在不活动状态，无法处理用户响应。
 * paused：不可见并不能响应用户的输入，但是在后台继续活动中。
 
+
 ## 跨组件传输数据
 
 * InheritedWidget：主要体现是下层Widget主动去向上层拿数据，实现相对复杂，，缺点传值方向的单一；
@@ -69,3 +71,34 @@ Route 是页面的抽象，主要负责创建对应的界面，接收参数，�
 * 命名路由。需要提前注册页面标识符，在页面切换时通过标识符直接打开新的路由。
 
 页面参数在目标页面通过 RouteSettings 来获取页面参数。
+
+## 依赖管理
+可以把资源存放在项目中的任意目录下，只需要使用根目录下的 pubspec.yaml 文件，对这些资源的所在位置进行显式声明就可以了，以帮助 Flutter 识别出这些资源。
+
+Flutter 基于像素密度，设立不同分辨率的目录分开管理，但只需要在 pubspec.yaml 声明一次；而字体则基于样式支持，除了正常字体，还可以支持粗体、斜体等样式。最后，由于 Flutter 需要原生运行环境，因此对于在其启动之前所需的启动图和图标这两类特殊资源，我们还需要分别去原生工程中进行相应的设置。
+
+例如图片在根目录下增加文件夹，在pubspec.yaml下增加声明
+
+![](./asset.png)
+
+	  assets:
+	      - images/
+
+
+### Pub
+[https://pub.dev/](https://pub.dev/)来获取可用的第三方包
+
+	dependencies:
+	  flutter:
+	    sdk: flutter
+	
+	
+	  # The following adds the Cupertino Icons font to your application.
+	  # Use with the CupertinoIcons class for iOS style icons.
+	  cupertino_icons: ^1.0.0
+	  date_format: 1.0.6
+	  event_bus: 1.1.0
+	
+	dev_dependencies:
+	  flutter_test:
+	    sdk: flutter
