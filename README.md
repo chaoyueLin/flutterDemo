@@ -102,3 +102,92 @@ Flutter 基于像素密度，设立不同分辨率的目录分开管理，但只
 	dev_dependencies:
 	  flutter_test:
 	    sdk: flutter
+
+
+## 单线程模型
+Dart是基于单线程模型的语言。在Dart中有一个很重要的概念叫isolate，它其实就是一个线程或者进程的实现，具体取决于Dart的实现。默认情况下，我们用Dart写的应用都是运行在****main isolate****中的（可以对应理解为Android中的main thread）。当然我们在必要的时候也可以通过isolate API创建新的isolate，多个isolate可以更好的利用多核CPU的特性来提高效率。但是要注意的是在Dart中isolate之间是无法直接共享内存的，不同的isolate之间只能通过isolate API进行通信。
+
+一个Dart应用有一个消息循环(event loop) 和两个消息队列（event queue 和 microtask queue）。
+
+每个isolate都有单独的event loop
+
+event队列包含所有外来的事件：I/O，mouse events，drawing events，timers，isolate之间的message等。
+
+microtask 队列在Dart中是必要的，因为有时候事件处理想要在稍后完成一些任务但又希望是在执行下一个事件消息之前。
+
+![](./queue.png)
+
+### Future
+
+ * 创建->Future.value,Future.delayed
+ * then,hen注册在 Future 完成时调用的回调。
+当这个 Future 用一个 value 完成时，将使用该值调用onValue回调。
+如果 Future已经完成，则不会立即调用回调，而是将在稍后的microtask（微任务）中调度。
+如果回调返回Future，那么then返回的future将与callback返回的future结果相同。
+ * whenComplete
+ * onError
+
+### await,async
+await只能在async函数出现。 async函数，返回值是一个Future对象，如果没有返回Future对象，会自动将返回值包装成Future对象。 
+
+捕捉错误，一般是使用try/catch机制来做异常处理。 await 一个future，可以拿到Future的结果，直到拿到结果，才执行下一步的代码。
+
+	try {
+	  var result1 = await Future.value(1);
+	  print(result1);//输出1
+	  var result2 = await Future.value(2);
+	  print(result2);//输出2
+	} catch (e) {
+	    //捕捉错误
+	} finally {
+	  
+	}
+
+### Isolate
+Dart 自然提供了 Isolate 之间通讯的方式：port 端口，可以很方便的实现 Isolate 之间的双向通讯，原理是向对方的队列里写入任务
+port 成对出现，分为：receivePort 接受端口 和 SendPort 发送端口，receivePort 可以自己生成对应的 SendPort，只要把 SendPort 传递给对方就能实现从 SendPort->receivePort 的通许，当然这是单项的，双向通讯的其实也一样，对面把自己的 SendPort 传过来就成了
+
+* 创建 Isolate 的 API 是：await Isolate.spawn(Function,SendPort)，因为这是个异步操作，所以加上 await，Function 这是个方法，是新的线程执行的核心方法，和 run 方法一样的意思，SendPort 就是我们要传给对面的通讯器
+* Isolate.listen 监听方法我们可以拿到这个 Isolate 传递过来的数据
+* await receivePort.first 可以等待获取第一个返回结果，但是不能和 receivePort.listen 一起写，有冲突，只能选择一个
+
+
+		var anotherIsolate;
+		var value = "Now Thread!";
+		
+		void startOtherIsolate() async {
+		  var receivePort = ReceivePort();
+		  var sendPort;
+		
+		  anotherIsolate = await Isolate.spawn(otherIsolateInit, receivePort.sendPort);
+		
+		  receivePort.listen((date) {
+		    if (date is SendPort) {
+		      sendPort = date as SendPort;
+		      print("双向通讯建立成功");
+		      return;
+		    }
+		    print("Isolate 1 接受消息：data = $date");
+		    sendPort.send("AA");
+		  });
+		}
+		
+		void otherIsolateInit(SendPort sendPort) async {
+		  value = "Other Thread!";
+		
+		  var receivePort = ReceivePort();
+		  print("Isolate 2 接受到来自 Isolate 1的port，尝试建立同 Isolate 1的双向通讯");
+		
+		  receivePort.listen((date) {
+		    print("Isolate 2 接受消息：data = $date");
+		  });
+		
+		  sendPort.send(receivePort.sendPort);
+		
+		  for (var index = 0; index < 10; index++) {
+		    sendPort.send("BB$index");
+		  }
+		}
+
+### compose
+compute 方法是 Flutter 提供给我们的(记住不是 Dart)，compute 内部会创建一个 Isolate 并返回计算结果，体验上和一次性线程一样，性能多少有些浪费

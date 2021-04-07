@@ -19,8 +19,7 @@ import 'AnimateDemo.dart';
 import 'HeroDemo.dart';
 
 void main() {
-  runApp(MaterialApp(
-      home:Page1()));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
