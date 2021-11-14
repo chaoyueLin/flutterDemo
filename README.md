@@ -191,3 +191,14 @@ port 成对出现，分为：receivePort 接受端口 和 SendPort 发送端口�
 
 ### compose
 compute 方法是 Flutter 提供给我们的(记住不是 Dart)，compute 内部会创建一个 Isolate 并返回计算结果，体验上和一次性线程一样，性能多少有些浪费
+
+## 持久化
+### 文件目录File
+### SharePreferences
+### sqlite
+## 方法通道（Method Channel）
+基于方法通道，我们可以将原生代码所拥有的能力，以接口形式暴露给 Dart，从而实现 Dart 代码与原生代码的交互，就像调用了一个普通的 Dart API 一样。
+![](./methon_channel.jpg)
+## 平台视图 (platformView)
+Flutter 提供了一种轻量级的方法，让我们可以创建原生（Android 和 iOS）的视图，通过一些简单的 Dart 层接口封装之后，就可以将它插入 Widget 树中，实现原生视图与 Flutter 视图的混用。
+![](./platformView.jpg)
