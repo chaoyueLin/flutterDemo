@@ -60,8 +60,8 @@ StatelessWidget 是静态的，一旦创建则无需更新；
 
 ## 跨组件传输数据
 
-* InheritedWidget：主要体现是下层Widget主动去向上层拿数据，实现相对复杂，，缺点传值方向的单一；
-* Notification：与InheritedWidget相反，主要体现推数据，针对性强，具体通知给哪个Widget明确，不需要跨多层实现，缺点实现起来相对繁琐点，传值方向单一；
+* InheritedWidget：主要体现是下层Widget主动去向上层拿数据，可以跨多层，实现相对复杂，，缺点传值方向的单一；
+* Notification：与InheritedWidget相反，主要体现推数据，针对性强，具体通知给哪个Widget明确，缺点实现起来相对繁琐点，传值方向单一；
 * EventBus：订阅关系，针对性强，全局使用，缺点是不同的事件需要定义不同的实体，传递时要区分哪个事件传递给哪个控件，销毁Widget时不能忘记取消订阅；
 
 ## 路由管理
@@ -117,16 +117,45 @@ microtask 队列在Dart中是必要的，因为有时候事件处理想要在稍
 
 ![](./queue.png)
 
+执行代码的顺序是按照main()方法，microtask队列，event队列
+
+	import 'dart:async';
+	main() {
+	  print('main #1 of 2');
+	  scheduleMicrotask(() => print('microtask #1 of 2'));
+	
+	  new Future.delayed(new Duration(seconds:1),
+	                     () => print('future #1 (delayed)'));
+	  new Future(() => print('future #2 of 3'));
+	  new Future(() => print('future #3 of 3'));
+	
+	  scheduleMicrotask(() => print('microtask #2 of 2'));
+	
+	  print('main #2 of 2');
+	}
+	
+	
+	结果:
+	
+	flutter: main #1 of 2
+	flutter: main #2 of 2
+	flutter: microtask #1 of 2
+	flutter: microtask #2 of 2
+	flutter: future #2 of 3
+	flutter: future #3 of 3
+	flutter: future #1 (delayed)
+
 ### Future
 
  * 创建->Future.value,Future.delayed
  * then,hen注册在 Future 完成时调用的回调。
-当这个 Future 用一个 value 完成时，将使用该值调用onValue回调。
-如果 Future已经完成，则不会立即调用回调，而是将在稍后的microtask（微任务）中调度。
-如果回调返回Future，那么then返回的future将与callback返回的future结果相同。
+	* 当这个 Future 用一个 value 完成时，将使用该值调用onValue回调。
+	* 如果 Future已经完成，则不会立即调用回调，而是将在稍后的microtask（微任务）中调度。
+	* 如果回调返回Future，那么then返回的future将与callback返回的future结果相同。
  * whenComplete
  * onError
 
+![](./future.gif)
 ### await,async
 await只能在async函数出现。 async函数，返回值是一个Future对象，如果没有返回Future对象，会自动将返回值包装成Future对象。 
 
